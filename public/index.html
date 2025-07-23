@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini Chatbot</title>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    .chatbox { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    .msg { margin: 10px 0; }
+    .user { text-align: right; color: blue; }
+    .bot { text-align: left; color: green; }
+    input { width: 100%; padding: 10px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="chatbox" id="chatbox">
+    <div class="msg bot">🤖 Hello! Ask me anything.</div>
+  </div>
+  <input id="input" placeholder="Type a message and press Enter" />
+
+  <script>
+    async function sendMessage(message) {
+      document.getElementById("chatbox").innerHTML += `<div class="msg user">${message}</div>`;
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: message })
+      });
+      const data = await res.json();
+      document.getElementById("chatbox").innerHTML += `<div class="msg bot">${data.reply}</div>`;
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    document.getElementById("input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        const msg = this.value.trim();
+        if (msg) {
+          sendMessage(msg);
+          this.value = "";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
